@@ -7,8 +7,12 @@ dotenv.config();
 const mongoose = require("mongoose");
 const authRoute = require("./Routes/auth");
 
+const cors = require("cors");
+
 // express parser
 app.use(express.json());
+
+app.use(cors({ credentials: true, origin: "http://localhost:3001" }));
 
 const PORT = process.env.PORT;
 
