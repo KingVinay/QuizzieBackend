@@ -133,8 +133,33 @@ const deleteQuiz = async (req, res, next) => {
   }
 };
 
+const getQuizById = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+
+    if (!quizId) {
+      return res.status(400).json({ errorMessage: "Quiz ID is required!" });
+    }
+
+    const quiz = await Quiz.findById(quizId);
+
+    if (!quiz) {
+      return res.status(404).json({ errorMessage: "Quiz not found!" });
+    }
+
+    // Increment impressions
+    quiz.impressions += 1;
+    await quiz.save();
+
+    res.json(quiz);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createQuiz,
   editQuiz,
   deleteQuiz,
+  getQuizById,
 };
