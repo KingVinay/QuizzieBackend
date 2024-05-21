@@ -49,6 +49,7 @@ const quizSchema = new mongoose.Schema({
     type: Date,
     default: new Date(),
   },
+  impressions: { type: Number, default: 0 }, //Impressions Count for Quiz
   totalSubmissions: { type: Number, default: 0 }, // Total submissions for Q&A
 });
 

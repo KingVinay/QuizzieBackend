@@ -6,6 +6,7 @@ dotenv.config();
 
 const mongoose = require("mongoose");
 const authRoute = require("./Routes/auth");
+const quizRoute = require("./Routes/quiz");
 
 const cors = require("cors");
 
@@ -32,6 +33,7 @@ app.get("/api/health", (req, res) => {
 
 // Middleware
 app.use("/api/auth", authRoute);
+app.use("/api/quiz", quizRoute);
 
 // Middleware for Error
 app.use((error, req, res, next) => {

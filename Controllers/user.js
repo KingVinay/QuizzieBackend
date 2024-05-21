@@ -79,7 +79,16 @@ const loginUser = async (req, res, next) => {
   }
 };
 
+const logoutUser = async (req, res, next) => {
+  try {
+    res.status(200).json("User logged out successfully!");
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  logoutUser,
 };
