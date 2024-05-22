@@ -49,8 +49,14 @@ const createQuiz = async (req, res, next) => {
       questions,
     });
 
-    await quizData.save();
-    res.json({ message: "Quiz created successfully!" });
+    const savedQuiz = await quizData.save();
+
+    // Generate shareable link
+    const shareableLink = `${req.protocol}://${req.get("host")}/quizzes/${
+      savedQuiz.quizName
+    }`;
+
+    res.json({ message: "Quiz created successfully!", shareableLink });
   } catch (error) {
     next(error);
   }
@@ -157,9 +163,104 @@ const getQuizById = async (req, res, next) => {
   }
 };
 
+const getAllQuizzes = async (req, res, next) => {
+  try {
+    const quizzes = await Quiz.find().sort({ impressions: -1 });
+    res.json(quizzes);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getQuizStatistics = async (req, res, next) => {
+  try {
+    const quizzes = await Quiz.find();
+
+    const totalQuizzes = quizzes.length;
+    const totalQuestions = quizzes.reduce(
+      (acc, quiz) => acc + quiz.questions.length,
+      0
+    );
+    const totalImpressions = quizzes.reduce(
+      (acc, quiz) => acc + (quiz.impressions || 0),
+      0
+    );
+
+    res.json({
+      totalQuizzes,
+      totalQuestions,
+      totalImpressions,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const submitQuiz = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+    const { responses } = req.body;
+
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) {
+      return res.status(404).json({ errorMessage: "Quiz not found!" });
+    }
+
+    const totalQuestions = quiz.questions.length;
+    const correctQuestions = 0;
+
+    quiz.totalSubmissions += 1;
+
+    for (const response of responses) {
+      const question = quiz.questions.id(response.questionId);
+      if (!question) {
+        continue; // Skip if the question is not found
+      }
+
+      if (quiz.quizType === "q&a") {
+        const correctOption = question.options.find(
+          (option) => option.isCorrect
+        );
+        const selectedOption = question.options.id(response.selectedOptionId);
+
+        if (selectedOption && correctOption) {
+          if (selectedOption._id.equals(correctOption._id)) {
+            question.correctSubmissions += 1;
+            correctQuestions += 1;
+          } else {
+            question.wrongSubmissions += 1;
+          }
+        }
+      } else if (quiz.quizType === "poll") {
+        const selectedOption = question.options.id(response.selectedOptionId);
+        if (selectedOption) {
+          selectedOption.selectedCount += 1;
+        }
+      }
+    }
+
+    await quiz.save();
+
+    if (quiz.quizType === "poll") {
+      return res.json({ message: "Quiz submitted successfully!" });
+    }
+
+    res.json({
+      message: "Quiz submitted successfully!",
+      correctQuestions,
+      totalQuestions,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createQuiz,
   editQuiz,
   deleteQuiz,
   getQuizById,
+  getAllQuizzes,
+  getQuizStatistics,
+  submitQuiz,
 };
