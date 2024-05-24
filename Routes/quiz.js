@@ -10,5 +10,6 @@ router.get("/quizbyid/:quizId", quizController.getQuizById);
 router.get("/all", verifyToken, quizController.getAllQuizzes);
 router.get("/stats", verifyToken, quizController.getQuizStatistics);
 router.post("/submit/:quizId", quizController.submitQuiz);
+router.get("/analytics/:quizId", verifyToken, quizController.getQuizAnalytics);
 
 module.exports = router;

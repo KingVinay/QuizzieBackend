@@ -255,6 +255,44 @@ const submitQuiz = async (req, res, next) => {
   }
 };
 
+const getQuizAnalytics = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) {
+      return res.status(404).json({ errorMessage: "Quiz not found!" });
+    }
+
+    const analytics = {
+      quizName: quiz.quizName,
+      createdAt: quiz.createdAt,
+      impressions: quiz.impressions,
+      totalSubmissions: quiz.totalSubmissions,
+      questions: [],
+    };
+
+    if (quiz.quizType === "q&a") {
+      analytics.questions = quiz.questions.map((question) => ({
+        questionName: question.questionName,
+        correctSubmissions: question.correctSubmissions,
+        wrongSubmissions: question.wrongSubmissions,
+      }));
+    } else if (quiz.quizType === "poll") {
+      analytics.questions = quiz.questions.map((question) => ({
+        questionName: question.questionName,
+        options: question.options.map((option) => ({
+          selectedCount: option.selectedCount,
+        })),
+      }));
+    }
+
+    res.json(analytics);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createQuiz,
   editQuiz,
@@ -263,4 +301,5 @@ module.exports = {
   getAllQuizzes,
   getQuizStatistics,
   submitQuiz,
+  getQuizAnalytics,
 };
