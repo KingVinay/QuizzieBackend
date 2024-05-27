@@ -3,6 +3,7 @@ const Quiz = require("../Models/quiz");
 const createQuiz = async (req, res, next) => {
   try {
     const { quizName, quizType, timer, questions } = req.body;
+
     if (
       !quizName ||
       !quizType ||
@@ -42,11 +43,14 @@ const createQuiz = async (req, res, next) => {
       }
     }
 
+    const createdBy = req.userId;
+
     const quizData = new Quiz({
       quizName,
       quizType,
       timer,
       questions,
+      createdBy,
     });
 
     const savedQuiz = await quizData.save();
@@ -165,7 +169,9 @@ const getQuizById = async (req, res, next) => {
 
 const getAllQuizzes = async (req, res, next) => {
   try {
-    const quizzes = await Quiz.find().sort({ impressions: -1 });
+    const quizzes = await Quiz.find({ createdBy: req.userId }).sort({
+      impressions: -1,
+    });
     res.json(quizzes);
   } catch (error) {
     next(error);
@@ -174,7 +180,7 @@ const getAllQuizzes = async (req, res, next) => {
 
 const getQuizStatistics = async (req, res, next) => {
   try {
-    const quizzes = await Quiz.find();
+    const quizzes = await Quiz.find({ createdBy: req.userId });
 
     const totalQuizzes = quizzes.length;
     const totalQuestions = quizzes.reduce(

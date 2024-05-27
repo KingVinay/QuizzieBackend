@@ -51,6 +51,11 @@ const quizSchema = new mongoose.Schema({
   },
   impressions: { type: Number, default: 0 }, //Impressions Count for Quiz
   totalSubmissions: { type: Number, default: 0 }, // Total submissions for Q&A
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Quiz", quizSchema);
