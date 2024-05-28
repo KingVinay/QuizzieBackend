@@ -11,5 +11,6 @@ router.get("/all", verifyToken, quizController.getAllQuizzes);
 router.get("/stats", verifyToken, quizController.getQuizStatistics);
 router.post("/submit/:quizId", quizController.submitQuiz);
 router.get("/analytics/:quizId", verifyToken, quizController.getQuizAnalytics);
+router.get("/share/:quizId", verifyToken, quizController.shareQuiz);
 
 module.exports = router;

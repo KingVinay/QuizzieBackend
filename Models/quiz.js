@@ -56,6 +56,9 @@ const quizSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  shareableLink: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("Quiz", quizSchema);

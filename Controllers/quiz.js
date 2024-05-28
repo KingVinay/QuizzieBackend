@@ -51,14 +51,15 @@ const createQuiz = async (req, res, next) => {
       timer,
       questions,
       createdBy,
+      shareableLink: "",
     });
 
     const savedQuiz = await quizData.save();
 
     // Generate shareable link
-    const shareableLink = `${req.protocol}://${req.get("host")}/quizzes/${
-      savedQuiz.quizName
-    }`;
+    const shareableLink = `${process.env.FRONTEND_HOST}/quiz/${savedQuiz._id}`;
+    savedQuiz.shareableLink = shareableLink;
+    await savedQuiz.save();
 
     res.json({ message: "Quiz created successfully!", shareableLink });
   } catch (error) {
@@ -299,6 +300,21 @@ const getQuizAnalytics = async (req, res, next) => {
   }
 };
 
+const shareQuiz = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+
+    const quiz = await Quiz.findOne({ _id: quizId, createdBy: req.userId });
+    if (!quiz) {
+      return res.status(404).json({ errorMessage: "Quiz not found!" });
+    }
+
+    res.json({ shareableLink: quiz.shareableLink });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createQuiz,
   editQuiz,
@@ -308,4 +324,5 @@ module.exports = {
   getQuizStatistics,
   submitQuiz,
   getQuizAnalytics,
+  shareQuiz,
 };
