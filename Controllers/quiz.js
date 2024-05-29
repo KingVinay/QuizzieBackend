@@ -2,21 +2,16 @@ const Quiz = require("../Models/quiz");
 
 const createQuiz = async (req, res, next) => {
   try {
-    const { quizName, quizType, timer, questions } = req.body;
+    const { quizName, quizType, questions } = req.body;
 
-    if (
-      !quizName ||
-      !quizType ||
-      !timer ||
-      !questions ||
-      questions.length === 0
-    ) {
+    if (!quizName || !quizType || !questions || questions.length === 0) {
       return res.status(400).json({ errorMessage: "All fields are required!" });
     }
 
     for (const question of questions) {
       if (
         !question.questionName ||
+        !question.timer ||
         !question.optionType ||
         !question.options ||
         question.options.length === 0
@@ -48,7 +43,6 @@ const createQuiz = async (req, res, next) => {
     const quizData = new Quiz({
       quizName,
       quizType,
-      timer,
       questions,
       createdBy,
       shareableLink: "",
@@ -70,13 +64,13 @@ const createQuiz = async (req, res, next) => {
 const editQuiz = async (req, res, next) => {
   try {
     const { quizId } = req.params;
-    const { timer, questions } = req.body;
+    const { questions } = req.body;
 
     if (!quizId) {
       return res.status(400).json({ errorMessage: "Quiz ID is required!" });
     }
 
-    if (!timer || !questions || questions.length === 0) {
+    if (!questions || questions.length === 0) {
       return res.status(400).json({ errorMessage: "All Fields are required!" });
     }
 
@@ -88,6 +82,7 @@ const editQuiz = async (req, res, next) => {
     for (const question of questions) {
       if (
         !question.questionName ||
+        !question.timer ||
         !question.optionType ||
         !question.options ||
         question.options.length === 0
@@ -113,8 +108,6 @@ const editQuiz = async (req, res, next) => {
         }
       }
     }
-
-    quiz.timer = timer;
     quiz.questions = questions;
 
     await quiz.save();
@@ -273,6 +266,7 @@ const getQuizAnalytics = async (req, res, next) => {
 
     const analytics = {
       quizName: quiz.quizName,
+      quizType: quiz.quizType,
       createdAt: quiz.createdAt,
       impressions: quiz.impressions,
       totalSubmissions: quiz.totalSubmissions,

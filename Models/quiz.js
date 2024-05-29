@@ -19,6 +19,11 @@ const questionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  timer: {
+    type: String,
+    enum: ["none", "5s", "10s"],
+    default: "none",
+  },
   optionType: {
     type: String,
     enum: ["text", "image url", "text and image url"],
@@ -38,11 +43,6 @@ const quizSchema = new mongoose.Schema({
     type: String,
     enum: ["poll", "q&a"],
     required: true,
-  },
-  timer: {
-    type: String,
-    enum: ["none", "5s", "10s"],
-    default: "none",
   },
   questions: [questionSchema],
   createdAt: {
