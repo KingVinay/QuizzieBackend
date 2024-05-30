@@ -199,7 +199,7 @@ const getQuizStatistics = async (req, res, next) => {
 const submitQuiz = async (req, res, next) => {
   try {
     const { quizId } = req.params;
-    const { responses } = req.body;
+    const { selectedOptions } = req.body;
 
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
@@ -211,7 +211,7 @@ const submitQuiz = async (req, res, next) => {
 
     quiz.totalSubmissions += 1;
 
-    for (const response of responses) {
+    for (const response of selectedOptions) {
       const question = quiz.questions.id(response.questionId);
       if (!question) {
         continue; // Skip if the question is not found
