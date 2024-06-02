@@ -137,7 +137,7 @@ const deleteQuiz = async (req, res, next) => {
   }
 };
 
-const getQuizById = async (req, res, next) => {
+const getQuiz = async (req, res, next) => {
   try {
     const { quizId } = req.params;
 
@@ -154,6 +154,26 @@ const getQuizById = async (req, res, next) => {
     // Increment impressions
     quiz.impressions += 1;
     await quiz.save();
+
+    res.json(quiz);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getQuizById = async (req, res, next) => {
+  try {
+    const { quizId } = req.params;
+
+    if (!quizId) {
+      return res.status(400).json({ errorMessage: "Quiz ID is required!" });
+    }
+
+    const quiz = await Quiz.findById(quizId);
+
+    if (!quiz) {
+      return res.status(404).json({ errorMessage: "Quiz not found!" });
+    }
 
     res.json(quiz);
   } catch (error) {
@@ -207,9 +227,7 @@ const submitQuiz = async (req, res, next) => {
     }
 
     const totalQuestions = quiz.questions.length;
-    const correctQuestions = 0;
-
-    quiz.totalSubmissions += 1;
+    let correctQuestions = 0;
 
     for (const response of selectedOptions) {
       const question = quiz.questions.id(response.questionId);
@@ -239,6 +257,7 @@ const submitQuiz = async (req, res, next) => {
       }
     }
 
+    quiz.totalSubmissions += 1;
     await quiz.save();
 
     if (quiz.quizType === "poll") {
@@ -313,6 +332,7 @@ module.exports = {
   createQuiz,
   editQuiz,
   deleteQuiz,
+  getQuiz,
   getQuizById,
   getAllQuizzes,
   getQuizStatistics,
