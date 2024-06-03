@@ -184,6 +184,17 @@ const getQuizById = async (req, res, next) => {
 const getAllQuizzes = async (req, res, next) => {
   try {
     const quizzes = await Quiz.find({ createdBy: req.userId }).sort({
+      createdAt: 1,
+    });
+    res.json(quizzes);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getTrendingQuizzes = async (req, res, next) => {
+  try {
+    const quizzes = await Quiz.find({ createdBy: req.userId }).sort({
       impressions: -1,
     });
     res.json(quizzes);
@@ -335,6 +346,7 @@ module.exports = {
   getQuiz,
   getQuizById,
   getAllQuizzes,
+  getTrendingQuizzes,
   getQuizStatistics,
   submitQuiz,
   getQuizAnalytics,

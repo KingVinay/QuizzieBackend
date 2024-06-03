@@ -9,6 +9,7 @@ router.delete("/delete/:quizId", verifyToken, quizController.deleteQuiz);
 router.get("/quizbyid/:quizId", quizController.getQuizById);
 router.get("/getquiz/:quizId", quizController.getQuiz);
 router.get("/all", verifyToken, quizController.getAllQuizzes);
+router.get("/trending", verifyToken, quizController.getTrendingQuizzes);
 router.get("/stats", verifyToken, quizController.getQuizStatistics);
 router.post("/submit/:quizId", quizController.submitQuiz);
 router.get("/analytics/:quizId", verifyToken, quizController.getQuizAnalytics);
