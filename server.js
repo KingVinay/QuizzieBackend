@@ -13,7 +13,7 @@ const cors = require("cors");
 // express parser
 app.use(express.json());
 
-app.use(cors({ credentials: true, origin: process.env.FRONTEND_HOST }));
+app.use(cors());
 
 const PORT = process.env.PORT || 4000;
 
