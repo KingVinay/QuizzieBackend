@@ -194,10 +194,9 @@ const getAllQuizzes = async (req, res, next) => {
 
 const getTrendingQuizzes = async (req, res, next) => {
   try {
-    const quizzes = Quiz.aggregate([
-      { $match: { createdBy: req.userId, impressions: { $gt: 10 } } },
-      { $sort: { impressions: -1 } },
-    ]);
+    const quizzes = await Quiz.find({ createdBy: req.userId }).sort({
+      impressions: -1,
+    });
     res.json(quizzes);
   } catch (error) {
     next(error);
